@@ -3,6 +3,8 @@ import wifi
 from machine import Pin, I2C
 from time import sleep_ms
 
+wifi.connect()
+
 MPU6050_ADDR = 0x68
 MPU6050_ACCEL_XOUT_H = 0x3B
 MPU6050_ACCEL_XOUT_L = 0x3C
@@ -67,7 +69,10 @@ def mpu6050_get_gyro(i2c):
             #combine_register_values(gyro_y_h, gyro_y_l) / MPU6050_LSBDS,
             #combine_register_values(gyro_z_h, gyro_z_l) / MPU6050_LSBDS]
 
-def gyro_response():
+if __name__ == "__main__":
+    i2c = I2C(scl=Pin(22), sda=Pin(21))
+    mpu6050_init(i2c)
+    
     while True:
         try:
             print("Accelerometer:\t", mpu6050_get_accel(i2c), "g")
@@ -79,12 +84,5 @@ def gyro_response():
                 response = urequests.post("http://192.168.1.1:1880/Gyro", data = str(0))
             sleep_ms(500)
         except OSError as error:
-            wifi.connect()
             print(error)
             sleep_ms(500)
-
-if __name__ == "__main__":
-    i2c = I2C(scl=Pin(22), sda=Pin(21))
-    wifi.connect()
-    mpu6050_init(i2c)
-    gyro_response()
